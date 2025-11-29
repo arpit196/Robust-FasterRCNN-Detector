@@ -1,4 +1,4 @@
-# Faster R-CNN in PyTorch and TensorFlow 2 w/ Keras
+# Robust Faster R-CNN in TensorFlow 2 w/ LBIN
 *Copyright 2021-2022 Bart Trzynadlowski*
 
 ## Overview
@@ -7,11 +7,9 @@
   <img src="docs/images/gary.png" height="250" /> <img src="docs/images/scud.png" height="250" />
 </p>
 
-This is a fresh implementation of the Faster R-CNN object detection model in both PyTorch and TensorFlow 2 with Keras, using Python 3.7 or higher. Although several years old now, Faster R-CNN remains a foundational work in the field and still influences modern object detectors.
+This is an implementation of the Faster R-CNN object detection model in TensorFlow 2.10 with Keras, using Python 3.7 or higher. Although several years old now, Faster R-CNN remains a foundational work in the field and still influences modern object detectors. In our work, we use Local Block Instance Normalization (LBIN), which allows us to deploy a robust detection model.
 
-I set out to replicate [the original paper](docs/publications/faster_rcnn.pdf) from scratch using Keras but quickly ran into difficulties and spent considerable time overcoming them. For the benefit of those undertaking a similar self-learning exercise -- whether involving this or other machine learning models -- my struggles, learnings, and observations are [documented here](#development-learnings).
-
-My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 14 epochs (10 epochs at a learning rate of 0.001 and 4 more at 0.0001), consistent with the learning schedule the paper used. Both the PyTorch and Keras implementations include a VGG-16 backbone for feature extractor and for the stage just prior to box classification and regression. The PyTorch implementation also includes the option to use ResNet.
+My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone for the feature extractor and for the stage just prior to box classification and regression.
 
 | Class | Average Precision (VGG-16) | Average Precision (ResNet50) | Average Precision (ResNet101) | Average Precision (ResNet152) |
 |-------|----------------------------|------------------------------|-------------------------------|-------------------------------|
