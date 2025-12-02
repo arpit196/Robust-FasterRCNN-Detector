@@ -58,18 +58,6 @@ Python 3.7 (for `dataclass` support) or higher is required and I personally use 
 
 Instructions here are given for Linux systems.
 
-### PyTorch Setup with CUDA
-
-The PyTorch version *requires* CUDA. I strongly recommend installing the latest CUDA version. Then, executing the following commands in the base Faster R-CNN source directory should create an environment and install the required dependencies:
-
-```
-python -m venv pytorch_venv
-source pytorch_venv/bin/activate
-pip install -r pytorch/requirements.txt
-```
-
-If this fails, go to the [PyTorch web site](https://pytorch.org/) and use their installation picker to select a pip package compatible with your version of CUDA. Run the command displayed there.
-
 ### TensorFlow 2 Setup
 
 The TensorFlow version does not require CUDA, although its use is highly advised to achieve acceptable performance. TensorFlow environment set up *without* CUDA is very straightforward. The included `tf2/requirements.txt` file should suffice.
@@ -95,10 +83,10 @@ The `download_dataset.sh` script will automatically fetch and extract VOC2007 to
 
 To train the model, initial weights for the shared VGG-16 layers are required. Keras provides these but PyTorch does not. Instead, the PyTorch model supports initialization from one of two sources:
 
-1. Pre-trained VGG-16 Caffe weights that can be found online as `vgg16_caffe.pth` (SHA1: `e6527a06abfac585939b8d50f235569a33190570`).
-2. Pre-trained VGG-16 weights obtained using [my own Keras model](https://github.com/trzy/VGG16).
+1. Pre-trained VGG-16 Caffe weights that can be found online as `vgg16_caffe.h5` (SHA1: `e6527a06abfac585939b8d50f235569a33190570`).
+2. Pre-trained VGG-16 weights obtained using [my own Keras model].
 
-Fortunately, `vgg16_caffe.pth` and pre-trained Faster R-CNN weights for both the PyTorch and TensorFlow versions can be obtained using `download_models.sh`. My web host is not particularly reliable so if the site is down, try again later or contact me. The models were trained using the scripts included in this repository (`train_pytorch_vgg16.sh`, `train_pytorch_resnet50.sh`, and `train_tf2.sh`).
+Fortunately, `vgg16_caffe.pth` and pre-trained Faster R-CNN weights for both the PyTorch and TensorFlow versions can be obtained using `download_models.sh`. My web host is not particularly reliable so if the site is down, try again later or contact me.
 
 When training the TensorFlow version of the model from scratch and no initial weights are loaded explicitly, the Keras pre-trained VGG-16 weights will automatically be used. When training the PyTorch version, remember to load initial VGG-16 weights explicitly, e.g.:
 
@@ -128,11 +116,11 @@ Numerous training parameters are available. Defaults are set to be consistent wi
 Replicating the paper results requires training with stochastic gradient descent (the only option in the PyTorch version; the default in the TensorFlow version) for 10 epochs at a learning rate of 0.001 and a subsequent 4 epochs at 0.0001. The default momentum and weight decay are 0.9 and 5e-4, respectively, and image augmentation via random horizontal flips is enabled.
 
 ```
-python -m pytorch.FasterRCNN --train --learning-rate=1e-3 --epochs=10 --load-from=vgg16_caffe.pth --save-best-to=results_1.pth
-python -m pytorch.FasterRCNN --train --learning-rate=1e-4 --epochs=4 --load-from=results_1.pth --save-best-to=results_final.pth
+python -m pytorch.FasterRCNN --train --learning-rate=1e-3 --epochs=10 --load-from=checkpoint-in1-epoch-1-mAP-77.8.h5 --save-best-to=best_model.h5
+python -m pytorch.FasterRCNN --train --learning-rate=1e-4 --epochs=4 --load-from=best_model.h5 --save-best-to=final_model.h5
 ```
 
-This assumes that the dataset is present at `VOCdevkit/VOC2007/`. The mean average precision is computed from a subset of evaluation samples after each epoch and the best weights are saved at the end of training. The final model weights, regardless of accuracy, can also be saved using `--save-to` and checkpoints can be saved after each epoch to a directory using `--checkpoint-dir`.
+This assumes that the dataset is present at `VOCdevkit/VOC2007/`. The mean average precision is computed from a subset of evaluation samples after each epoch, and the best weights are saved at the end of training. The final model weights, regardless of accuracy, can also be saved using `--save-to` and checkpoints can be saved after each epoch to a directory using `--checkpoint-dir`.
 
 **NOTE:** The data loader is simple but slow. If you have the CPU memory to spare (80-100 GB), `--cache-images` retains all images in memory after they are first read from disk, improving performance.
 
@@ -155,6 +143,15 @@ python -m tf2.FasterRCNN --load-from=saved_weights.h5 --predict=http://trzy.org/
 python -m tf2.FasterRCNN --load-from=saved_weights.h5 --predict-to-file=image.png
 python -m tf2.FasterRCNN --load-from=saved_weights.h5 --predict-all=test
 ```
+
+### Deploying model live
+
+You can deploy the object detector model and test it in real time with a webcam integrated to your laptop/PC with the --deploy option.
+Just run 
+
+python -m tf2.FasterRCNN --deploy --load-from=saved_weights.h5
+and you will see a video output of your webcam continuously detecting the objects present in its field of view.
+
 
 ### ResNet Backbone
 
