@@ -144,12 +144,15 @@ python -m tf2.FasterRCNN --load-from=saved_weights.h5 --predict-to-file=image.pn
 python -m tf2.FasterRCNN --load-from=saved_weights.h5 --predict-all=test
 ```
 
-### Deploying model live
+### Deploying the model live
 
 You can deploy the object detector model and test it in real time with a webcam integrated to your laptop/PC with the --deploy option.
 Just run 
 
+```
 python -m tf2.FasterRCNN --deploy --load-from=saved_weights.h5
+```
+
 and you will see a video output of your webcam continuously detecting the objects present in its field of view.
 
 
