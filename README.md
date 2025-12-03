@@ -11,29 +11,29 @@ This is an implementation of the Faster R-CNN object detection model in TensorFl
 
 My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone for the feature extractor and for the stage just prior to box classification and regression.
 
-| Class | Average Precision (VGG-16) | Average Precision (ResNet50) | Average Precision (ResNet101) | Average Precision (ResNet152) |
-|-------|----------------------------|------------------------------|-------------------------------|-------------------------------|
-| cat        | 84.6% | 87.3% | 90.1% | 89.0% |
-| car        | 84.0% | 85.5% | 88.5% | 88.4% |
-| horse      | 82.3% | 84.8% | 87.4% | 87.3% |
-| bus        | 81.8% | 84.1% | 85.9% | 86.6% |
-| bicycle    | 80.9% | 81.2% | 84.8% | 85.8% |
-| dog        | 80.2% | 81.0% | 83.8% | 84.5% |
-| person     | 78.5% | 79.8% | 83.3% | 83.5% |
-| train      | 77.2% | 79.8% | 82.3% | 82.8% |
-| motorbike  | 76.6% | 79.5% | 81.3% | 82.3% |
-| cow        | 75.8% | 79.0% | 79.6% | 81.2% |
-| aeroplane  | 74.9% | 74.9% | 78.7% | 78.5% |
-| tvmonitor  | 73.1% | 73.8% | 78.1% | 78.5% |
-| sheep      | 67.6% | 71.7% | 77.2% | 76.0% |
-| bird       | 66.0% | 70.6% | 76.1% | 72.8% |
-| diningtable| 65.9% | 69.9% | 71.9% | 72.1% |
-| sofa       | 65.1% | 67.2% | 65.3% | 67.4% |
-| boat       | 57.4% | 59.9% | 64.2% | 62.9% |
-| bottle     | 55.6% | 57.4% | 60.0% | 56.7% |
-| chair      | 49.5% | 50.3% | 56.0% | 55.7% |
-| pottedplant| 40.6% | 46.9% | 49.1% | 47.8% |
-|**Mean**    | **71.0%** | **73.2%** | **76.2%** | **76.0%** |
+| Class | Average Precision (VGG-16) | Average Precision (VGG-16, LBIN normalized) |
+|-------|----------------------------|------------------------------|
+| cat        | 84.6% | 87.1% |
+| car        | 84.0% | 83.7% |
+| horse      | 82.3% | 90.6% |
+| bus        | 81.8% | 75.9% |
+| bicycle    | 80.9% | 85.2% |
+| dog        | 80.2% | 86.2% |
+| person     | 78.5% | 77.8% |
+| train      | 77.2% | 88.0% |
+| motorbike  | 76.6% | 86.8% |
+| cow        | 75.8% | 81.9% |
+| aeroplane  | 74.9% | 82.7% |
+| tvmonitor  | 73.1% | 86.5% |
+| sheep      | 67.6% | 67.2% |
+| bird       | 66.0% | 77.7% |
+| diningtable| 65.9% | 62.5% |
+| sofa       | 65.1% | 76.2% |
+| boat       | 57.4% | 76.7% |
+| bottle     | 55.6% | 58.7% |
+| chair      | 49.5% | 63.6% |
+| pottedplant| 40.6% | 50.3% |
+|**Mean**    | **71.0%** | **77.27%** |
 
 ## Background Material
 
