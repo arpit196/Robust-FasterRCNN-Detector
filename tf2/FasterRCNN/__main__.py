@@ -319,8 +319,7 @@ def detect(model, frame, original_frame, score_threshold=0.7, show_image=True):
 
     # Bounding box drawing
     height, width = original_frame.shape[:2]
-    #original_frame = cv2.cvtColor(original_frame, cv2.COLOR_BGR2RGB).astype(np.uint8)
-    original_frame = contrast(original_frame,severity=4).astype(np.uint8)
+    #original_frame = contrast(original_frame,severity=4).astype(np.uint8)
     
     #original_frame = brightness(original_frame,severity=1)
     for class_index, boxes_scored in scored_boxes_by_class_index.items():
@@ -397,8 +396,7 @@ def render(model):
         # Convert BGR (OpenCV) to RGB (model)
         #rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        rgb_frame = contrast(rgb_frame,severity=4)
-        #rgb_frame = brightness(rgb_frame,severity=1)
+        #rgb_frame = contrast(rgb_frame,severity=4)
         print('frame_shape')
         print(frame.shape)
         # Detect objects in the frame
