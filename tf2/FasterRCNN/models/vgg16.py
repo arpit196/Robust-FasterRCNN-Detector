@@ -97,22 +97,22 @@ class FeatureExtractor(tf.keras.Model):
   
     # First two convolutional blocks are frozen (not trainable)
     self._block1_conv1 = Conv2D(name = "block1_conv1", input_shape = input_shape, kernel_size = (3,3), strides = 1, filters = 64, padding = "same", activation = "relu", kernel_initializer = initial_weights, trainable = False)
-    self._block1_in1 = BatchNormalization() # LocalInstanceNormalizationL1() #
+    self._block1_in1 = LocalInstanceNormalizationL1() #BatchNormalization() # LocalInstanceNormalizationL1() #
     self._block1_conv2 = Conv2D(name = "block1_conv2", kernel_size = (3,3), strides = 1, filters = 64, padding = "same", activation = "relu", kernel_initializer = initial_weights, trainable = False)
-    self._block1_in2 = BatchNormalization() # LocalInstanceNormalizationL1() #
+    self._block1_in2 =  LocalInstanceNormalizationL1() #BatchNormalization() # LocalInstanceNormalizationL1() #
     self._block1_maxpool = MaxPooling2D(pool_size = 2, strides = 2)
 
     self._block2_conv1 = Conv2D(name = "block2_conv1", kernel_size = (3,3), strides = 1, filters = 128, padding = "same", activation = "relu", kernel_initializer = initial_weights, trainable = False)
-    self._block2_in1 = BatchNormalization() #LocalInstanceNormalizationL1() #
+    self._block2_in1 = LocalInstanceNormalizationL1() #BatchNormalization() #LocalInstanceNormalizationL1() #
     self._block2_conv2 = Conv2D(name = "block2_conv2", kernel_size = (3,3), strides = 1, filters = 128, padding = "same", activation = "relu", kernel_initializer = initial_weights, trainable = False)
-    self._block2_in2 = BatchNormalization() #LocalInstanceNormalizationL1() #
+    self._block2_in2 = LocalInstanceNormalizationL1() #BatchNormalization() #LocalInstanceNormalizationL1() #
     self._block2_maxpool = MaxPooling2D(pool_size = 2, strides = 2)
 
     # Weight decay begins from these layers onward: https://github.com/rbgirshick/py-faster-rcnn/blob/master/models/pascal_voc/VGG16/faster_rcnn_end2end/train.prototxt
     self._block3_conv1 = Conv2D(name = "block3_conv1", kernel_size = (3,3), strides = 1, filters = 256, padding = "same", activation = "relu", kernel_initializer = initial_weights, kernel_regularizer = regularizer)
-    self._block3_in1 = BatchNormalization() #LocalInstanceNormalizationL1() #
+    self._block3_in1 = LocalInstanceNormalizationL1() #BatchNormalization() #LocalInstanceNormalizationL1() #
     self._block3_conv2 = Conv2D(name = "block3_conv2", kernel_size = (3,3), strides = 1, filters = 256, padding = "same", activation = "relu", kernel_initializer = initial_weights, kernel_regularizer = regularizer)
-    self._block3_in2 = BatchNormalization() #LocalInstanceNormalizationL1() #
+    self._block3_in2 = LocalInstanceNormalizationL1() #BatchNormalization() #LocalInstanceNormalizationL1() #
     self._block3_conv3 = Conv2D(name = "block3_conv3", kernel_size = (3,3), strides = 1, filters = 256, padding = "same", activation = "relu", kernel_initializer = initial_weights, kernel_regularizer = regularizer)
     #self._block3_in3 = LocalInstanceNormalizationL1()
     self._block3_maxpool = MaxPooling2D(pool_size = 2, strides = 2)

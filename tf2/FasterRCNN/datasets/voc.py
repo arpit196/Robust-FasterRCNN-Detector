@@ -143,10 +143,10 @@ class Dataset:
     scaled_image_data, scaled_image, scale_factor, original_shape = image.load_image(url = filepath, min_dimension_pixels = 600, horizontal_flip = flip)
     _, original_height, original_width = original_shape
     #print(numpy.max(scaled_image))
-    if self.noise=='contrast':
+    #if self.noise=='contrast':
       #print('Hi1')
       #print(np.array(scaled_image))
-      scaled_image = gaussian_noise(scaled_image,severity=4)
+      #scaled_image = defocus_blur(scaled_image,severity=3)
       #print('Hi')
       #scaled_image = brightness(scaled_image,severity=2)
       #print(scaled_image)

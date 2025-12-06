@@ -64,7 +64,8 @@ def load_image(url, min_dimension_pixels = None, horizontal_flip = False):
   else:
     scale_factor = 1.0
   image_data = np.array(image).astype(np.float32)
-  image_data = gaussian_noise(image_data,severity=4)
+  #image_data = defocus_blur(image_data,severity=3)
+  #image_data = gaussian_noise(image_data,severity=4)
   #image_data = brightness(image_data,severity=2)
   image_data = _preprocess_vgg16(image_data = image_data)
   return image_data, image, scale_factor, (image_data.shape[0], original_height, original_width)
