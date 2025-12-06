@@ -7,9 +7,9 @@
   <img src="docs/images/gary.png" height="250" /> <img src="docs/images/scud.png" height="250" />
 </p>
 
-This is an implementation of the Faster R-CNN object detection model in TensorFlow 2.10 with Keras, using Python 3.7 or higher. Although several years old now, Faster R-CNN remains a foundational work in the field and still influences modern object detectors. In our work, we use Local Block Instance Normalization (LBIN), which allows us to deploy a robust detection model.
+This is an implementation of the Faster Robust R-CNN object detection model in TensorFlow 2.10 with Keras, using Python 3.10. Although several years old now, Faster R-CNN remains a foundational work in the field and still influences modern object detectors. In our work, we use Local Block Instance Normalization (LBIN), which allows us to deploy a robust detection model which works even under noise, contrast and brightness changes.
 
-My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone for the feature extractor and for the stage just prior to box classification and regression.
+My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone with Local Block Instance Normalization (LBIN) in early layers for the feature extractor and in the stage just immediately preceding box classification and regression.
 
 | Class | Average Precision (VGG-16) | Average Precision (VGG-16, LBIN normalized) |
 |-------|----------------------------|------------------------------|
@@ -79,21 +79,6 @@ training and benchmarking. Images are split into `train`, `val`, and `test` spli
 
 The `download_dataset.sh` script will automatically fetch and extract VOC2007 to the default location: `VOCdevkit/VOC2007`. If your dataset is somewhere else, use `--dataset-dir` to point the program to it.
 
-## Pre-Trained Models and Initial Weights
-
-To train the model, initial weights for the shared VGG-16 layers are required. Keras provides these but PyTorch does not. Instead, the PyTorch model supports initialization from one of two sources:
-
-1. Pre-trained VGG-16 Caffe weights that can be found online as `vgg16_caffe.h5` (SHA1: `e6527a06abfac585939b8d50f235569a33190570`).
-2. Pre-trained VGG-16 weights obtained using [my own Keras model].
-
-Fortunately, `vgg16_caffe.pth` and pre-trained Faster R-CNN weights for both the PyTorch and TensorFlow versions can be obtained using `download_models.sh`. My web host is not particularly reliable so if the site is down, try again later or contact me.
-
-When training the TensorFlow version of the model from scratch and no initial weights are loaded explicitly, the Keras pre-trained VGG-16 weights will automatically be used. When training the PyTorch version, remember to load initial VGG-16 weights explicitly, e.g.:
-
-```
-python -m pytorch.FasterRCNN --train --epochs=10 --learning-rate=1e-3 --load-from=vgg16_caffe.pth
-```
-
 ## Running the Model
 
 From the base directory and assuming the proper environment is configured, the PyTorch model is run like this:
@@ -116,11 +101,21 @@ Numerous training parameters are available. Defaults are set to be consistent wi
 Replicating the paper results requires training with stochastic gradient descent (the only option in the PyTorch version; the default in the TensorFlow version) for 10 epochs at a learning rate of 0.001 and a subsequent 4 epochs at 0.0001. The default momentum and weight decay are 0.9 and 5e-4, respectively, and image augmentation via random horizontal flips is enabled.
 
 ```
-python -m pytorch.FasterRCNN --train --learning-rate=1e-3 --epochs=10 --load-from=checkpoint-in1-epoch-1-mAP-77.8.h5 --save-best-to=best_model.h5
-python -m pytorch.FasterRCNN --train --learning-rate=1e-4 --epochs=4 --load-from=best_model.h5 --save-best-to=final_model.h5
+python -m tf2.FasterRCNN --train --learning-rate=1e-3 --epochs=10 --load-from=checkpoint-in1-epoch-1-mAP-77.8.h5 --save-best-to=best_model.h5
+python -m tf2.FasterRCNN --train --learning-rate=1e-4 --epochs=4 --load-from=best_model.h5 --save-best-to=final_model.h5
 ```
 
 This assumes that the dataset is present at `VOCdevkit/VOC2007/`. The mean average precision is computed from a subset of evaluation samples after each epoch, and the best weights are saved at the end of training. The final model weights, regardless of accuracy, can also be saved using `--save-to` and checkpoints can be saved after each epoch to a directory using `--checkpoint-dir`.
+
+## Pre-Trained Models and Initial Weights
+
+To fine-tune the model, initial weights for the shared VGG-16 layers are required. The pretrained model weights for LBIN model are present as file checkpoint-in1-epoch-1-mAP-77.8.h5, while the Batch Normalized variant is present as 
+
+When training the TensorFlow version of the model from scratch and no initial weights are loaded explicitly, the Keras pre-trained VGG-16 weights will automatically be used. When training the PyTorch version, remember to load initial VGG-16 weights explicitly, e.g.:
+
+```
+python -m pytorch.FasterRCNN --train --epochs=10 --learning-rate=1e-3 --load-from=vgg16_caffe.pth
+```
 
 **NOTE:** The data loader is simple but slow. If you have the CPU memory to spare (80-100 GB), `--cache-images` retains all images in memory after they are first read from disk, improving performance.
 
@@ -155,36 +150,6 @@ python -m tf2.FasterRCNN --deploy --load-from=saved_weights.h5
 
 and you will see a video output of your webcam continuously detecting the objects present in its field of view.
 
-
-### ResNet Backbone
-
-The PyTorch version supports different backbones. In addition to VGG-16, a few variants of ResNet (ResNet50, ResNet101, and ResNet152) are available. The `--backbone` option is used to specify one of the following backbones:
-
-| Argument | Backbone Description |
-|----------|----------------------|
-| `vgg16` | Custom VGG-16 backbone. The default. |
-| `vgg16-torch` | VGG-16 backbone implemented using Torchvision's pre-trained VGG-16 layers. |
-| `resnet50` | ResNet50 backbone implemented using Torchvision's pre-trained ResNet50 layers. |
-| `resnet101` | ResNet101 backbone implemented using Torchvision's pre-trained ResNet101 layers. |
-| `resnet152` | ResNet152 backbone implemented using Torchvision's pre-trained ResNet152 layers. |
-
-All but `vgg16` load Torchvision pre-trained weights and therefore do not need to be initialized with an explicit weights file. When loading weights to resume training, the backbone must be set to be same as the one used to produce the weights. The `vgg16-torch` implementation does not accept the same weights files as `vgg16`, including `vgg16_caffe.pth`. It automatically
-initializes itself using the built-in Torchvision weights (also trained on ImageNet but expecting a slightly different image pre-processing scheme) and therefore can be run without any input file. It also serves as an example of how to create a new backbone class.
-
-Here is an example of how to train a model using a ResNet101 backbone:
-
-```
-python -m pytorch.FasterRCNN --train --backbone=resnet101 --learning-rate=1e-3 --epochs=10 --save-best-to=results_1.pth
-python -m pytorch.FasterRCNN --train --backbone=resnet101 --learning-rate=1e-4 --epochs=4 --load-from=results_1.pth --save-best-to=results_final.pth
-```
-
-**Important**: When running inference with a ResNet checkpoint, the matching backbone architecture must explicitly be specified with `--backbone`, otherwise the default backbone (VGG-16) will be assumed and the checkpoint will fail to load. For example, to use the above trained ResNet101 model:
-
-```
-python -m pytorch.FasterRCNN --backbone=resnet101 --load-from=results_final.pth --predict=http://trzy.org/files/fasterrcnn/gary.jpg
-```
-
-The TensorFlow version does not support alternative backbones yet.
 
 ## Development Learnings
 
