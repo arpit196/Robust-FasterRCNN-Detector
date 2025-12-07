@@ -150,7 +150,7 @@ python -m tf2.FasterRCNN --deploy --load-from=saved_weights.h5
 
 and you will see a video output of your webcam continuously detecting the objects present in its field of view.
 
-![](https://github.com/arpit196/Robust-FasterRCNN-Detector/blob/main/demos/Faster-RCNN-(Unprocessed-video).gif)
+![](https://github.com/arpit196/Robust-FasterRCNN-Detector/blob/main/demos/Faster-RCNN-(Unprocessed-video).gif?raw=true)
 
 
 ## Development Learnings
