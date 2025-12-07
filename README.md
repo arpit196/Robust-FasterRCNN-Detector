@@ -3,10 +3,6 @@
 
 ## Overview
 
-<p align="center">
-  <img src="docs/images/gary.png" height="250" /> <img src="docs/images/scud.png" height="250" />
-</p>
-
 This is an implementation of the Faster Robust R-CNN object detection model in TensorFlow 2.10 with Keras, using Python 3.10. Although several years old now, Faster R-CNN remains a foundational work in the field and still influences modern object detectors. In our work, we use Local Block Instance Normalization (LBIN), which allows us to deploy a robust detection model which works even under noise, contrast and brightness changes.
 
 My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone with Local Block Instance Normalization (LBIN) in early layers for the feature extractor and in the stage just immediately preceding box classification and regression.
@@ -150,7 +146,16 @@ python -m tf2.FasterRCNN --deploy --load-from=saved_weights.h5
 
 and you will see a video output of your webcam continuously detecting the objects present in its field of view.
 
+Here's Live detection demo of a person on an unprocessed video feed:
 ![](https://github.com/arpit196/Robust-FasterRCNN-Detector/blob/main/demos/Faster-RCNN-(Unprocessed-video).gif?raw=true)
+
+Here's Live detection demo of a person on a video feed with contrast changes (contrast enhancement) using batch-normalized VGG-16:
+![BN](https://github.com/arpit196/Robust-FasterRCNN-Detector/blob/main/demos/Faster-RCNN-using-BN-(Contrast-Enhancement).gif?raw=true)
+
+Here's Live detection demo of the same person on a video feed with contrast changes (contrast enhancement) using our LBIN normalized VGG-16:
+![LBIN](https://github.com/arpit196/Robust-FasterRCNN-Detector/blob/main/demos/Faster-RCNN-using-LBIN%20(Contrast-Enhancement).gif?raw=true)
+
+Our model correctly detects person even under contrast changes to camera feed whereas batch normalized version can't.
 
 
 ## Development Learnings
