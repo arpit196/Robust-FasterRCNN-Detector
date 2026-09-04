@@ -50,22 +50,10 @@ This repository implements **Local Block Instance Normalization (LBIN)** within 
 
 My final results using the VOC2007 dataset's 5011 `trainval` images match the paper's. Convergence is achieved in 7 epochs (6 epochs at a learning rate of 0.001 and 1 more at 0.0001). Our implementations include a VGG-16 backbone with Local Block Instance Normalization (LBIN) in early layers for the feature extractor and in the stage just immediately preceding box classification and regression.
 
-## Background Material
+## Why LBIN Works:
+Standard Batch Normalization (BN) relies on batch-wide statistics during training. When deployed on real-world edge devices, single-image inference under sudden lighting shifts degrades BN performance.
 
-Required literature for understanding Faster R-CNN:
-
-- [*Very Deep Convolutional Networks for Large-Scale Image Recognition*](docs/publications/vgg16.pdf) by Karen Simonyan and Andrew Zisserman. Describes VGG-16, which serves as the backbone (the input stage and feature extractor) of Faster R-CNN.
-- [*Fast R-CNN*](docs/publications/fast_rcnn.pdf) by Ross Girshick. Describes Fast R-CNN, a significant improvement over R-CNN. Faster R-CNN shares both its backbone and detector head (the final stages that produce boxes and class scores) with Fast R-CNN.
-- [*Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks*](docs/publications/faster_rcnn.pdf) by Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster R-CNN improves upon Fast R-CNN by introducing a network that computes the initial object proposals directly, allowing all stages -- feature extraction, proposal generation, and final object detection -- to be trained together end-to-end.
-
-Some informative web resources and existing code:
-
-- [*Understanding Region of Interest -- (RoI Pooling)*](https://towardsdatascience.com/understanding-region-of-interest-part-1-roi-pooling-e4f5dd65bb44) by Kemal Erdem. A great explanation of RoI pooling.
-- [*A Simple and Fast Implementation of Faster R-CNN*](https://github.com/chenyuntc/simple-faster-rcnn-pytorch) by Yun Chen. An excellent PyTorch implementation of Faster R-CNN.
-
-ResNet, which popularized "skip connections" that allowed for training of much deeper models, can be used in place of VGG-16 as a backbone and provides improved accuracy:
-
-- [*Deep Residual Learning for Image Recognition*](docs/publications/resnet.pdf) by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Describes ResNet and includes results of using the architecture in Faster R-CNN.
+Local Block Instance Normalization (LBIN) computes normalization statistics locally across spatial sub-blocks of individual feature channels, preventing global noise or local glare and feature statistics from other images from skewing representation vectors.
 
 ## Environment Setup
 
@@ -124,7 +112,7 @@ This assumes that the dataset is present at `VOCdevkit/VOC2007/`. The mean avera
 
 ## Pre-Trained Models and Initial Weights
 
-To fine-tune the model, initial weights for the shared VGG-16 layers are required. The pretrained model weights for the LBIN model are present as file checkpoint-in1-epoch-1-mAP-77.8.h5, while the Batch Normalized variant is present as 
+To fine-tune the model, initial weights for the shared VGG-16 layers are required. The pretrained model weights for the LBIN model are present as the file checkpoint-in1-epoch-1-mAP-77.8.h5, while the Batch Normalized variant is present as 
 
 When training the TensorFlow version of the model from scratch and no initial weights are loaded explicitly, the Keras pre-trained VGG-16 weights will automatically be used. When training the PyTorch version, remember to load initial VGG-16 weights explicitly, e.g.:
 
@@ -133,8 +121,6 @@ python -m pytorch.FasterRCNN --train --epochs=10 --learning-rate=1e-3 --load-fro
 ```
 
 **NOTE:** The data loader is simple but slow. If you have the CPU memory to spare (80-100 GB), `--cache-images` retains all images in memory after they are first read from disk, improving performance.
-
-The TensorFlow version has additional options. Namely, a choice of optimizer (SGD or Adam), two RoI pooling implementations, and the option for the detector stage to output logits rather than probabilities. TensorFlow lacks an exact RoI pooling operation, so by default, an approximation involving `tf.image.crop_and_resize` is used. A custom RoI pooling layer was implemented as a learning exercise but is too slow for practical use. When loading saved weights, make sure to set options consistently.
 
 For a complete list of options use `--help`.
 
@@ -203,6 +189,24 @@ optimizer.load_state_dict(state["optimizer_state_dict"])
 - Support for batch sizes larger than one. This could be accomplished by resizing all images to the width of the largest image in the dataset, padding the additional space with black pixels, and ensuring that the ground truth RPN map ignores the padded space by marking anchors within it invalid. A substantial amount of code assumes a batch size of one and would need to be modified.
 - Replacement of the ground truth RPN map -- which stores anchor validity, object/background label, and box delta regression targets in a single tensor -- with simpler lists of anchors and labels. This would greatly simplify the loss functions, among other code, and potentially improve performance.
 - Better custom RoI pooling implementation for TensorFlow. This will almost certainly require writing a CUDA implementation. There are examples of this online.
+
+## Background Material
+
+Required literature for understanding Faster R-CNN:
+
+- [*Very Deep Convolutional Networks for Large-Scale Image Recognition*](docs/publications/vgg16.pdf) by Karen Simonyan and Andrew Zisserman. Describes VGG-16, which serves as the backbone (the input stage and feature extractor) of Faster R-CNN.
+- [*Fast R-CNN*](docs/publications/fast_rcnn.pdf) by Ross Girshick. Describes Fast R-CNN, a significant improvement over R-CNN. Faster R-CNN shares both its backbone and detector head (the final stages that produce boxes and class scores) with Fast R-CNN.
+- [*Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks*](docs/publications/faster_rcnn.pdf) by Shaoqing Ren, Kaiming He, Ross Girshick, and Jian Sun. Faster R-CNN improves upon Fast R-CNN by introducing a network that computes the initial object proposals directly, allowing all stages -- feature extraction, proposal generation, and final object detection -- to be trained together end-to-end.
+
+Some informative web resources and existing code:
+
+- [*Understanding Region of Interest -- (RoI Pooling)*](https://towardsdatascience.com/understanding-region-of-interest-part-1-roi-pooling-e4f5dd65bb44) by Kemal Erdem. A great explanation of RoI pooling.
+- [*A Simple and Fast Implementation of Faster R-CNN*](https://github.com/chenyuntc/simple-faster-rcnn-pytorch) by Yun Chen. An excellent PyTorch implementation of Faster R-CNN.
+
+ResNet, which popularized "skip connections" that allowed for training of much deeper models, can be used in place of VGG-16 as a backbone and provides improved accuracy:
+
+- [*Deep Residual Learning for Image Recognition*](docs/publications/resnet.pdf) by Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun. Describes ResNet and includes results of using the architecture in Faster R-CNN.
+
 
 
 
