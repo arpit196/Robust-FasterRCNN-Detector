@@ -1,5 +1,4 @@
-# Robust Faster R-CNN in TensorFlow 2 with LBIN normalization
-
+# Robust Faster R-CNN LBIN normalization for domain and noise robust detector.
 ## Overview
 This is an implementation of the Faster Robust R-CNN object detection model in TensorFlow 2.10 with Keras, using Python 3.10. 
 
@@ -17,7 +16,15 @@ This repository implements **Local Block Instance Normalization (LBIN)** within 
 
 ## ⚡ Real-Time Robustness Demonstration
 
-| Class | Average Precision (VGG-16) | Average Precision (VGG-16, LBIN normalized) |
+| Baseline (Batch Normalization) | **Our Approach (LBIN Normalization)** |
+| :---: | :---: |
+| ![BN Demo](demos/Faster-RCNN-using-BN-(Contrast-Enhancement).gif) | ![LBIN Demo](demos/Faster-RCNN-using-LBIN%20(Contrast-Enhancement).gif) |
+| ❌ *Loses detection tracking under contrast change* | ✅ *Maintains robust bounding box tracking across glare/noise* |
+
+---
+
+
+| Class | Average Precision (VGG-16, Batch Normalized) | Average Precision (VGG-16, our approach: LBIN normalized) |
 |-------|----------------------------|------------------------------|
 | cat        | 84.6% | 87.1% |
 | car        | 84.0% | 83.7% |
